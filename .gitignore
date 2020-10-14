@@ -1,0 +1,6 @@
+Storage/
+games/
+node_modules/
+package-lock.json
+package.json
+token.js
