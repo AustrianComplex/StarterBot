@@ -33,6 +33,9 @@ client.on('message', message =>{
 
     // Command responses vvv
 
+    console.log(message.guild);
+    console.log(message.guild.id);
+
     if (message.author.bot) return;
 
     const args = message.content.split(/ +/);
@@ -46,13 +49,9 @@ client.on('message', message =>{
     const command = client.commands.get(commandName);
 
     if (command.args && args.length < command.numargs) {
-        let reply = `${message.author} This command requires arguments.`;
-
-        if (command.usage) {
-            reply += `\nExample: \`${prefix}${command.name} ${command.usage}\``;
-        }
-
-        return message.channel.send(reply);
+        
+        message.reply(`This command requires arguments.\nExample: \`${prefix}${command.name} ${command.usage}\``);
+        return;
     }
 
     try {
