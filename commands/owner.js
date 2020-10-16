@@ -7,25 +7,17 @@ module.exports= {
     execute(message, args){
         const fs = require('fs');
         const utilities = require('../utilities.js');
-        const client = require('../main.js');
 
         //get game name
         const gamename = utilities.getGameName(args, 1, args.length - 1);
-        const dir = `./games/${gamename}`;
+        const gameid = utilities.getGameIdFromName(gamename);
+        const dir = `./games/${gameid}`;
 
         //verify game exists
         if(!utilities.verifyGameExists(message, gamename))
         {
             return;
-        }
-        
-        //verify owner.txt exists
-        if(!fs.existsSync(`${dir}/owner.txt`))
-        {
-            console.log(`owner.txt for ${gamename} not found`);
-            message.reply("an error occurred. Please contact bot maintainer");
-            return;
-        }        
+        } 
         
         //retrieve owner id
         const ownerid = fs.readFileSync(`${dir}/owner.txt`);

@@ -8,31 +8,46 @@ module.exports= {
         const fs = require('fs');
         const utilities = require('../utilities.js');
 
-        //get game name and directory name
+        //get game name
         const gamename = utilities.getGameName(args, 1, args.length - 1);
-        const dir = `./games/${gamename}`;
 
         //notify console of start of action
         console.log(`\nReceived request to create game ${gamename}.`);
 
-        //check to see if directory (and therefore game name) already exists
-        if(fs.existsSync(dir)) {
-            const error = ["Conflict in naming game.\n", "a game with that name already exists! Please choose another name."];
-            console.log(error[0]);
-            message.reply(error[1]);
+        //check to see if the game already exists
+        if(utilities.verifyGameExists(message, gamename, false))
+        {
+            console.log("Conflict in naming game.");
+            message.reply("a game with that name already exists!");
             return;
         }
+
+        //create a new game id
+        var gameid = utilities.getRandomInt(0, 99999999);
+        while(utilities.getGameNameFromId(gameid) != -1)
+        {
+            gameid = utilities.getRandomInt(0, 99999999);
+        }
+
+        //map to gamemap.txt
+        fs.appendFileSync("gamemap.txt", `${gamename}  ${gameid}\n`);
+
+        //create directory
+        const dir = `./games/${gameid}`
 
         //make new game directory
         fs.mkdir(dir, (err) => {
             if(err)
             {
-                const error = [`Error creating game directory for ${gamename}. Error data: ${err}\n`, "an error occured and your game could not be made!"];
-                console.log(error[0]);
-                message.reply(error[1]);
+                console.log(`Error creating game directory for ${gamename}. Error data: ${err}`);
+                message.reply("An error occured and your game could not be made!");
                 return;
             }
         });
+
+        //create name file
+        fs.writeFileSync(dir + '/name.txt', `${gamename}`);
+        console.log(`Name file for ${gamename} created successfully!`);
 
         //create owner file
         fs.writeFileSync(dir + '/owner.txt', `${message.author.id}`);

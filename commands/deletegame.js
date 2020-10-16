@@ -11,8 +11,11 @@ module.exports= {
         //get game name
         const gamename = utilities.getGameName(args, 1, args.length - 1);
 
+        //get game id
+        const gameid = utilities.getGameIdFromName(gamename);
+
         //get game directory
-        const dir = './games/' + gamename;
+        const dir = `./games/${gameid}`;
 
         //log request in console
         console.log(`\nReceived request to delete ${gamename}.`);
@@ -29,12 +32,6 @@ module.exports= {
             return;
         }
 
-        //confirm decision
-        if(!utilities.awaitconfirmation(message))
-        {
-            return;
-        }
-
         //delete game files
         try{
             fs.rmdirSync(dir, { recursive: true });
@@ -45,6 +42,11 @@ module.exports= {
             message.reply("an error occurred while deleting your game!");
             return;
         }
+
+        //delete entry from gamemap
+        var hostdata = fs.readFileSync("gamemap.txt");
+        hostdata = hostdata.toString().replace(`${gamename}  ${gameid}\n`, "");
+        fs.writeFileSync("gamemap.txt", hostdata);
 
 
         //create message for user

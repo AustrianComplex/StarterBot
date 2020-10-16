@@ -10,7 +10,8 @@ module.exports = {
 
         //get game name
         const gamename = utilities.getGameName(args, 1, args.length - 2);
-        const dir = `./games/${gamename}`;
+        const gameid = utilities.getGameIdFromName(gamename);
+        const dir = `./games/${gameid}`;
 
         //verify game exists
         if(!utilities.verifyGameExists(message, gamename))
@@ -34,23 +35,18 @@ module.exports = {
         }
         const newownerid = utilities.getIdFromTag(newownertag);
 
-        //await confirmation
-        if(!utilities.awaitconfirmation(message))
-        {
-            return;
-        }
-
         //write new owner into file
         fs.writeFileSync(`${dir}/owner.txt`, newownerid);
 
         //if not a host, append new owner to host file
         if(!utilities.verifyHost(message, gamename, false, newownerid))
         {
-            fs.appendFileSync(`${dir}/hosts.txt`, `\n${newownerid}`);
+            fs.appendFileSync(`${dir}/hosts.txt`, `${newownerid}\n`);
         }
 
+        //send confirmation
         console.log(`Ownership of ${gamename} transferred to ${newownerid}.`);
-        message.reply(`you have transferred ownership of ${gamename} to ${newownertag}`);
+        message.reply(`You have transferred ownership of ${gamename} to ${newownertag}`);
 
         return;
     }

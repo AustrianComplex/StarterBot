@@ -13,6 +13,18 @@ module.exports= {
     client: client,
     prefix: prefix
 }
+
+//if there is no gamemap.txt file, make one
+if(!fs.existsSync("gamemap.txt"))
+{
+    fs.writeFileSync("gamemap.txt", "");
+}
+
+//if there is no servermap.txt file, make one
+if(!fs.existsSync("servermap.txt"))
+{
+    fs.writeFileSync("servermap.txt", "");
+}
  
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 for(const file of commandFiles){
@@ -32,9 +44,6 @@ client.once('ready', () => {
 client.on('message', message =>{
 
     // Command responses vvv
-
-    console.log(message.guild);
-    console.log(message.guild.id);
 
     if (message.author.bot) return;
 
@@ -57,16 +66,8 @@ client.on('message', message =>{
     try {
         command.execute(message, args);
     } catch (error) {
-        if(error instanceof Array)
-        {
-            console.log(error[0]);
-            message.reply(error[1]);
-        }
-        else
-        {
-            console.log(error);
-            message.reply('there was an error trying to execute that command!');
-        }
+        console.log(error);
+        message.reply('there was an error trying to execute that command!');
     }
 });
 

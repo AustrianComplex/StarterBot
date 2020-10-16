@@ -10,7 +10,8 @@ module.exports = {
 
         //get consts
         const gamename = utilities.getGameName(args, 1, args.length - 2);
-        const dir = `./games/${gamename}`;
+        const gameid = utilities.getGameIdFromName(gamename);
+        const dir = `./games/${gameid}`;
         const oldadmintag = args[args.length - 1];
 
         //verify game existence
@@ -22,14 +23,6 @@ module.exports = {
         //verify owner
         if(!utilities.verifyOwner(message, gamename))
         {
-            return;
-        }
-
-        //ensure hosts file exists
-        if(!fs.existsSync(`${dir}/hosts.txt`))
-        {
-            console.count(`Could not find hosts.txt file for ${gamename}`);
-            message.reply("an error occurred. Contact the bot's maintainer.");
             return;
         }
 
@@ -54,10 +47,11 @@ module.exports = {
         if(oldadminid == message.author.id)
         {
             console.log("Attempt to cancel own host status by owner");
-            message.reply("you can't make yourself not a host as owner.");
+            message.reply("You can't make yourself not a host as owner.");
             return;
         }
         
+        //attempt to remove host from file
         try
         {
             var hostdata = fs.readFileSync(`${dir}/hosts.txt`);
@@ -71,6 +65,7 @@ module.exports = {
             return;
         }
 
+        //notify of success
         console.log(`Successfully deleted ${oldadminid} as a host of ${gamename}`);
         message.reply(`${oldadmintag} was removed from their host position on ${gamename}.`);
         

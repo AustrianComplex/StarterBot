@@ -10,13 +10,14 @@ module.exports= {
 
         //constants for this function
         const gamename = utilities.getGameName(args, 1, args.length - 2);
+        const gameid = utilities.getGameIdFromName(gamename);
         const newadmintag = args[args.length - 1];
-        const dir = `./games/${gamename}`;
+        const dir = `./games/${gameid}`;
 
         //log the request
         console.log(`Addhost request for ${gamename}`)
 
-        //check to see if the game exists by checking if the directory exists
+        //check to see if the game exists
         if(!utilities.verifyGameExists(message, gamename)) 
         {
             return;

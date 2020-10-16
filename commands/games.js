@@ -15,22 +15,17 @@ module.exports= {
             return;
         }
 
-        const dir = "./games";
+        //populate the games list
+        var gameslist = "";
+        const gamedata = fs.readFileSync("gamemap.txt").toString().split(/\n/);
+        console.log(gamedata.length);
+        for(var count = 0; count < gamedata.length; count++)
+        {
+            gameslist += `${gamedata[count].split("  ")[0]}\n`;
+        }
 
-        //read games directory
-        fs.readdir(dir, (err, files) => {
-            if(err) {
-                console.log(`An error occurred while trying to access the games directory. Error data:\n${err}`)
-                message.reply("An error occurred while fetching the games list!");
-            }
-
-            var filenames = "";
-            files.forEach(file => {
-                filenames += `${file}\n`;
-            })
-            message.reply(`This is the list of current game names:\n${filenames}`);
-        });
-
+        //respond with the games list and return
+        message.reply(`${gameslist}`);
         return;
     }
 }
