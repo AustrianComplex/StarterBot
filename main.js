@@ -5,6 +5,7 @@ const client = new Discord.Client();
 const prefix = './';
 
 const fs = require('fs');
+const utilities = require('./utilities.js');
  
 client.commands = new Discord.Collection();
 
@@ -35,7 +36,6 @@ for(const file of commandFiles){
     }
 }
 
-
 client.once('ready', () => {
     console.log('BotBoi is online!');
     console.log(commandFiles);
@@ -43,9 +43,36 @@ client.once('ready', () => {
 
 client.on('message', message =>{
 
-    // Command responses vvv
-
+    //don't listen to bots they sus
     if (message.author.bot) return;
+
+    //check for connections and send message
+    let connected = utilities.checkConnections(message);
+    if(connected.length != 0)
+    {
+        for(var count = 0; count < connected.length; count++)
+        {
+            client.channels.fetch(connected[count]).then(connectedchannel => {
+                try{
+                    connectedchannel.fetchWebhooks().then(webhooks => {
+                        const webhook = webhooks.first();
+                        var name = "";
+                        if(message.member.nickname == null)
+                            name = message.author.username;
+                        else
+                            name = message.member.nickname.toString();
+                        var avatarurl = message.author.avatarURL();
+                        webhook.send(message, { username: name, avatarURL: avatarurl });
+                    }).catch(console.error);
+                }
+                catch(error) {
+                    console.error('Error trying to send: ', error);
+                }
+            }).catch(error => {});
+        }
+    }
+
+    // Command responses vvv
 
     const args = message.content.split(/ +/);
 

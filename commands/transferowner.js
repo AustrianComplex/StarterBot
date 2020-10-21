@@ -41,7 +41,7 @@ module.exports = {
         //if not a host, append new owner to host file
         if(!utilities.verifyHost(message, gamename, false, newownerid))
         {
-            fs.appendFileSync(`${dir}/hosts.txt`, `${newownerid}\n`);
+            fs.appendFileSync(`${dir}/hosts.txt`, `\n${newownerid}`);
         }
 
         //send confirmation

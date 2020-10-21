@@ -48,6 +48,11 @@ module.exports= {
         hostdata = hostdata.toString().replace(`${gamename}  ${gameid}\n`, "");
         fs.writeFileSync("gamemap.txt", hostdata);
 
+        //delete servers from servermap
+        var serverdata = fs.readFileSync("servermap.txt");
+        serverdata = hostdata.toString().replace (/\d+/ + `  ${gameid}\n`, "");
+        fs.writeFileSync("servermap.txt", serverdata);
+
 
         //create message for user
         switch(utilities.getRandomInt(0, 3)){

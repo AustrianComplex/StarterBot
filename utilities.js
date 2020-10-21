@@ -1,5 +1,3 @@
-const main = require('./main.js');
-
 module.exports= {
     //gamemap functions
     getGameNameFromId: function(id)
@@ -144,8 +142,30 @@ module.exports= {
         //game id found
         return true;
     },
+    verifyServerOwner(message, serverid, error=true, userid = message.author.id)
+    {
+        const client = require('./main.js').client;
+        return client.guilds.fetch(serverid).then(guild => {
+
+            //if the ids match, then good
+            if(guild.ownerID == userid)
+            {
+                return true;
+            }
+
+            //notify user if enabled
+            if(error)
+            {
+                console.log(`Invalid server owner request.`);
+                message.reply(`You are not the owner of the server.`);
+            }
+
+            //return false if not owner
+            return false;
+        });
+    },
     //servermap functions
-    getGameFromServerMap: function(guildid)
+    getGameIdFromServerMap: function(guildid)
     {
         const fs = require('fs');
 
@@ -153,7 +173,7 @@ module.exports= {
         const serverrawdata = fs.readFileSync("servermap.txt");
 
         //check each element for a guild id match
-        const serverdata = serverrawdata.split(/\n/);
+        const serverdata = serverrawdata.toString().split(/\n/);
         for(var count = 0; count < serverdata.length; count++)
         {
             let serverelement = serverdata[count].split("  ");
@@ -184,6 +204,39 @@ module.exports= {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
+    },
+    checkConnections: function(message)
+    {
+        const fs = require('fs');
+        const Discord = require('discord.js');
+
+        //ignore dmchannel requests
+        if(message.channel instanceof Discord.DMChannel)
+        {
+            return [];
+        }
+
+        //get the gameid
+        const gameid = this.getGameIdFromServerMap(message.channel.guild.id);
+
+        //if the server doesn't belong to the game just return -1
+        if(gameid == -1)
+        {
+            return -1;
+        }
+        
+        //get a connected channel's id if it exists
+        connections = fs.readFileSync(`./games/${gameid}/connections.txt`).toString().split("\n");
+        connectionids = [];
+        for(var count = 0; count < connections.length; count++)
+        {
+            let connection = connections[count].split("  ");
+            if(connection[0] == message.channel.id)
+            {
+                connectionids.push(connection[1]);
+            }
+        }
+        return connectionids;
     }
 
 }

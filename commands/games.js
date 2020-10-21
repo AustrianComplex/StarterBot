@@ -25,7 +25,7 @@ module.exports= {
         }
 
         //respond with the games list and return
-        message.reply(`${gameslist}`);
+        message.reply(`The following games are being tracked by this bot:\n${gameslist}`);
         return;
     }
 }

@@ -69,6 +69,10 @@ module.exports= {
         fs.writeFileSync(dir + '/observers.txt', '');
         console.log(`Observers file for ${gamename} created successfully!`);
 
+        //create connections list
+        fs.writeFileSync(dir + '/connections.txt', '');
+        console.log(`Connections file for ${gamename} created successfully!`);
+
         //notify console and user of success
         console.log(`${gamename} was created successfully!\n`);
         message.reply(`${gamename} was created successfully!`);
