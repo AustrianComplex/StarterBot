@@ -4,8 +4,6 @@
 
 <p>main.js contains core structures for running the bot, including an onMessage command handler.</p>
 
-<p>utilities.js contains a number of helpful smaller utility functions that are frequently run by commands.</p>
-
 <p>The commands directory contains the commands used by the program. You can add additional functions to the bot by adding additional command files here, following the format laid out in the commands readme.</p>
 
 ------------------------------------------------------------------------------------

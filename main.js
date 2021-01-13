@@ -1,19 +1,27 @@
 const Discord = require('discord.js');
 
-const client = new Discord.Client();
+const clientfile = require('./client.js');
+clientfile.initializeClient();
+const client = clientfile.client();
 
 const prefix = './';
 
 const fs = require('fs');
-const utilities = require('./utilities.js');
+
+const admin = require('./code/administration.js');
+const connections = require('./code/connections.js');
+const lynching = require('./code/lynchcommands.js');
+const serversetup = require('./code/serversetup.js');
+var secrets = null;
+try{
+    secrets = require('./code/secrets.js');
+}
+catch(err)
+{
+    console.log("No secrets.js file found");
+}
  
 client.commands = new Discord.Collection();
-
-module.exports= {
-    Discord: Discord,
-    client: client,
-    prefix: prefix
-}
 
 //if there is no gamemap.txt file, make one
 if(!fs.existsSync("gamemap.txt"))
@@ -26,13 +34,19 @@ if(!fs.existsSync("servermap.txt"))
 {
     fs.writeFileSync("servermap.txt", "");
 }
- 
-const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
-for(const file of commandFiles){
-    const command = require(`./commands/${file}`);
- 
-    for (let i = 0; i < command.name.length; i++) {
-        client.commands.set(command.name[i], command);
+
+const commandCategories = fs.readdirSync('./commands/');
+var commandFiles = [];
+for(var directory of commandCategories)
+{
+    var currentcommandFiles = fs.readdirSync(`./commands/${directory}`).filter(file => file.endsWith('.js'));
+
+    for(var file of currentcommandFiles){
+        const command = require(`./commands/${directory}/${file}`);
+        commandFiles.push([command.name[0]]);
+        for(let i = 0; i < command.name.length; i++){
+            client.commands.set(command.name[i], command);
+        }
     }
 }
 
@@ -46,37 +60,30 @@ client.on('message', message =>{
     //don't listen to bots they sus
     if (message.author.bot) return;
 
+    //check secrets
+    try{ secrets.checkSecrets(message); }
+    catch(error)
+    { console.log('secrets error'); }
+
     //check for connections and send message
-    let connected = utilities.checkConnections(message);
-    if(connected.length != 0)
-    {
-        for(var count = 0; count < connected.length; count++)
-        {
-            client.channels.fetch(connected[count]).then(connectedchannel => {
-                try{
-                    connectedchannel.fetchWebhooks().then(webhooks => {
-                        const webhook = webhooks.first();
-                        var name = "";
-                        if(message.member.nickname == null)
-                            name = message.author.username;
-                        else
-                            name = message.member.nickname.toString();
-                        var avatarurl = message.author.avatarURL();
-                        webhook.send(message, { username: name, avatarURL: avatarurl });
-                    }).catch(console.error);
-                }
-                catch(error) {
-                    console.error('Error trying to send: ', error);
-                }
-            }).catch(error => {});
-        }
-    }
+
+    try{ connections.checkConnections(message); }
+    catch(error)
+    { console.log('connections error'); }
 
     // Command responses vvv
 
+    //check for prefix match
+    if(message.content.length < prefix.length || message.content.substring(0, prefix.length) != prefix)
+        return;
+
+    //get arguments for command
     const args = message.content.split(/ +/);
 
-    const commandName = args[0].toLowerCase();
+    //get name of command
+    const commandName = args[0].toLowerCase().slice(prefix.length);
+
+
 
     // Commands vvv
 
@@ -84,14 +91,24 @@ client.on('message', message =>{
 
     const command = client.commands.get(commandName);
 
-    if (command.args && args.length < command.numargs) {
-        
-        message.reply(`This command requires arguments.\nExample: \`${prefix}${command.name} ${command.usage}\``);
-        return;
-    }
-
     try {
-        command.execute(message, args);
+        var returnvalue = command.execute(message, args);
+        if(returnvalue == false)
+        {
+            message.channel.send(`Your execution of the command failed. Make sure you spelled everything correctly` +
+                                ` and that you are in an appropriate channel\n` +
+                                `${command.name[0]} ${command.usage}: ${command.description}`);
+        }
+        if(command.erased == true)
+        {
+            try{
+                message.delete();
+            }
+            catch(err)
+            {
+                console.log(err);
+            }
+        }
     } catch (error) {
         console.log(error);
         message.reply('there was an error trying to execute that command!');
@@ -101,3 +118,7 @@ client.on('message', message =>{
 // Keep at bottom vvv
 
 client.login(require('./token.js').token);
+
+module.exports= {
+    prefix: prefix
+}

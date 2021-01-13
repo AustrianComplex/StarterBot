@@ -6,3 +6,4 @@ package.json
 token.js
 gamemap.txt
 servermap.txt
+code/secrets.js
