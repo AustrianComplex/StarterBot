@@ -159,6 +159,16 @@ var startlynch = function(gameid, necessaryvotes=-1)
         updatechannels[i].send(`**Voting has begun!**\n*It currently requires ${requiredvotes} to lynch!*`);
     }
 
+    var votingchannels = getchannels(gameid);
+    var votingroles = getroles(gameid);
+    for(var i = 0; i < votingchannels.length; i++)
+    {
+        for(var j = 0; j < votingroles.length; j++)
+        {
+            votingchannels[i].overwritePermissions([{id: votingroles[j], allow: ['SEND_MESSAGES'], }, ]).catch({});
+        }
+    }
+
     return true;
 }
 
@@ -198,6 +208,17 @@ var endnolynch = function(gameid)
         updatechannels[i].send(`**VOTING HAS ENDED!**`);
     }
 
+    //close all voting channels
+    var votingchannels = getchannels(gameid);
+    var votingroles = getroles(gameid);
+    for(var i = 0; i < votingchannels.length; i++)
+    {
+        for(var j = 0; j < votingroles.length; j++)
+        {
+            votingchannels[i].overwritePermissions([{id: votingroles[j], allow: ['SEND_MESSAGES'], }, ]).catch({});
+        }
+    }
+
     var votinginformation = getFullVotes(gameid);
     var votingstring = convertVotesToString(votinginformation);
 
@@ -217,6 +238,17 @@ var hammer = function(gameid, targetid)
     for(var i = 0; i < updatechannels.length; i++)
     {
         updatechannels[i].send(`**VOTING HAS ENDED!**`);
+    }
+
+    //close all voting channels
+    var votingchannels = getchannels(gameid);
+    var votingroles = getroles(gameid);
+    for(var i = 0; i < votingchannels.length; i++)
+    {
+        for(var j = 0; j < votingroles.length; j++)
+        {
+            votingchannels[i].overwritePermissions([{id: votingroles[j], allow: ['SEND_MESSAGES'], }, ]).catch({});
+        }
     }
 
     var votinginformation = getFullVotes(gameid);

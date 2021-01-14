@@ -32,6 +32,7 @@ var createGame = function(chosengamename, ownerid)
     fs.writeFileSync(`${dir}/${id}/hosts.txt`, `${ownerid}\n`);
     fs.writeFileSync(`${dir}/${id}/servers.txt`, "");
     fs.writeFileSync(`${dir}/${id}/connections.txt`, "");
+    fs.writeFileSync(`${dir}/${id}/hostupdatechannels.txt`, "");
     
     //write lynching files
     fs.mkdirSync(`${dir}/${id}/lynching`);
@@ -41,7 +42,6 @@ var createGame = function(chosengamename, ownerid)
     fs.writeFileSync(`${dir}/${id}/lynching/voteableexceptions.txt`, '');
     fs.writeFileSync(`${dir}/${id}/lynching/permissions.txt`, '1\n0\n');
     fs.writeFileSync(`${dir}/${id}/lynching/updatechannels.txt`, '');
-    fs.writeFileSync(`${dir}/${id}/lynching/hostupdatechannels.txt`, '');
     fs.writeFileSync(`${dir}/${id}/lynching/votecap.txt`,'');
     fs.writeFileSync(`${dir}/${id}/lynching/emoji.txt`, "😎");
 
